@@ -82,9 +82,10 @@ class RealMetricsPixelSender @Inject constructor(
 
     private suspend fun sendCountAlways(definition: PixelDefinition, threshold: Int) {
         val count = store.getMetricForPixelDefinition(definition)
-        if (count >= threshold) return
-        val newCount = store.increaseMetricForPixelDefinition(definition)
-        if (newCount != threshold) return
+        if (count < threshold) {
+            val newCount = store.increaseMetricForPixelDefinition(definition)
+            if (newCount < threshold) return
+        }
         if (!isInConversionWindow(definition)) return
         val tag = tagFor(definition)
         if (store.wasPixelFired(tag)) return
