@@ -18,6 +18,7 @@ package com.duckduckgo.duckchat.impl.sync
 
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.checkMainThread
@@ -148,7 +149,7 @@ class DuckChatSyncDataManager @Inject constructor(
             jsonArray.put(
                 org.json.JSONObject().apply {
                     put("id", chatId)
-                    put("deleted", "true")
+                    put("deleted", DatabaseDateFormatter.iso8601())
                 },
             )
         }
