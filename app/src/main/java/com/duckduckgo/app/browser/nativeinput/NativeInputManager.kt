@@ -71,6 +71,7 @@ class RealNativeInputManager @Inject constructor(
     private lateinit var rootView: ViewGroup
     private lateinit var layoutCoordinator: NativeInputLayoutCoordinator
     private var isNativeInputFieldEnabled: Boolean = false
+    private var pendingWidgetCardEndMarginUpdate: Runnable? = null
 
     private fun widgetFrom(widgetView: View): NativeInputWidget? {
         return widgetView.findViewById<View?>(R.id.inputModeWidget) as? NativeInputWidget
@@ -121,6 +122,7 @@ class RealNativeInputManager @Inject constructor(
     private fun onKeyboardShown(widgetRoot: View?) {
         if (omnibarController.isDuckAiMode()) return
         omnibarController.hide()
+        cancelPendingWidgetCardEndMarginUpdate()
         setWidgetCardEndMargin(0)
         widgetRoot?.translationZ = 0f
         if (layoutCoordinator.isWidgetBottom() && widgetRoot != null) {
@@ -154,9 +156,7 @@ class RealNativeInputManager @Inject constructor(
         if (widgetRoot != null) {
             layoutCoordinator.applyRoundedCardShape(widgetRoot)
         }
-        rootView.post {
-            setWidgetCardEndMargin(omnibarController.getButtonsWidth())
-        }
+        postWidgetCardEndMarginUpdate()
     }
 
     private fun isDescendantOf(ancestor: View, view: View): Boolean {
@@ -173,6 +173,20 @@ class RealNativeInputManager @Inject constructor(
         val params = card.layoutParams as? ViewGroup.MarginLayoutParams ?: return
         params.marginEnd = margin
         card.layoutParams = params
+    }
+
+    private fun postWidgetCardEndMarginUpdate() {
+        cancelPendingWidgetCardEndMarginUpdate()
+        pendingWidgetCardEndMarginUpdate = Runnable {
+            pendingWidgetCardEndMarginUpdate = null
+            setWidgetCardEndMargin(omnibarController.getButtonsWidth())
+        }
+        rootView.post(pendingWidgetCardEndMarginUpdate)
+    }
+
+    private fun cancelPendingWidgetCardEndMarginUpdate() {
+        pendingWidgetCardEndMarginUpdate?.let(rootView::removeCallbacks)
+        pendingWidgetCardEndMarginUpdate = null
     }
 
     override fun showNativeInput(

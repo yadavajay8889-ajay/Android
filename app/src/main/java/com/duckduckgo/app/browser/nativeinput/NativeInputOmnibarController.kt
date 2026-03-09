@@ -92,14 +92,16 @@ class RealNativeInputOmnibarController(
         omnibar.show()
         omnibar.isScrollingEnabled = false
         omnibar.setExpanded(true)
-        makeOmnibarTransparent(omnibarView)
-        hideOmnibarContent(omnibarView)
-        omnibarView.findViewById<View?>(R.id.duckAIHeader)?.gone()
-        omnibarView.findViewById<View?>(R.id.endIconsContainer)?.gone()
-        omnibarView.findViewById<View?>(R.id.duckAiSidebar)?.gone()
-        omnibarView.findViewById<View?>(R.id.fireIconMenu)?.gone()
-        omnibarView.findViewById<View?>(R.id.tabsMenu)?.show()
-        omnibarView.findViewById<View?>(R.id.browserMenu)?.show()
+        applyOnLayout(omnibarView) {
+            makeOmnibarTransparent(omnibarView)
+            hideOmnibarContent(omnibarView)
+            omnibarView.findViewById<View?>(R.id.duckAIHeader)?.gone()
+            omnibarView.findViewById<View?>(R.id.endIconsContainer)?.gone()
+            omnibarView.findViewById<View?>(R.id.duckAiSidebar)?.gone()
+            omnibarView.findViewById<View?>(R.id.fireIconMenu)?.gone()
+            omnibarView.findViewById<View?>(R.id.tabsMenu)?.show()
+            omnibarView.findViewById<View?>(R.id.browserMenu)?.show()
+        }
     }
 
     private fun makeOmnibarTransparent(omnibarView: View) {
