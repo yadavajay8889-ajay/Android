@@ -102,7 +102,6 @@ class RealRequestBlocklist @Inject constructor(
                 }
             }
 
-            logcat(tag = "RadoiuC") { "Init blocked requests list" }
             blockedRequests.clear()
             blockedRequests.putAll(newBlockedRequests)
         }

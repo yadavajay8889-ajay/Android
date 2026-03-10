@@ -85,10 +85,7 @@ interface RequestInterceptor {
         isForMainFrame: Boolean,
     ): Boolean
 
-    fun addExemptedMaliciousSite(
-        url: Uri,
-        feed: Feed,
-    )
+    fun addExemptedMaliciousSite(url: Uri, feed: Feed)
 }
 
 class WebViewRequestInterceptor(
@@ -214,12 +211,7 @@ class WebViewRequestInterceptor(
             webViewClientListener?.pageHasHttpResources(documentUri)
         }
 
-        if (!request.isForMainFrame && requestBlocklist.containedInBlocklist(documentUri.toString(), url.toString()).also {
-                logcat(tag = "RadoiuC") {
-                    "Checked if request is in the blocklist"
-                }
-            }
-        ) {
+        if (!request.isForMainFrame && requestBlocklist.containedInBlocklist(documentUri.toString(), url.toString())) {
             val isContentBlockingException = contentBlocking.isAnException(documentUri.toString())
             val isInTrackerAllowList = trackerAllowlist.isAnException(documentUri.toString(), url.toString())
             val isUserAllowlisted = userAllowListRepository.isUriInUserAllowList(documentUri)
@@ -277,7 +269,6 @@ class WebViewRequestInterceptor(
                 handleSiteSafe(webViewClientListener = webViewClientListener, uri = url, isForMainFrame = result.isForMainFrame)
                 return false
             }
-
             is MaliciousSite -> {
                 handleSiteBlocked(
                     webViewClientListener = webViewClientListener,
@@ -313,14 +304,10 @@ class WebViewRequestInterceptor(
                     isForMainFrame = isForMainFrame,
                 )
             }
-
             is MaliciousStatus.Safe -> {
                 handleSiteSafe(webViewClientListener = webViewClientListener, uri = url, isForMainFrame = isForMainFrame)
             }
-
-            is MaliciousStatus.Ignored -> {
-                /* Do nothing */
-            }
+            is MaliciousStatus.Ignored -> { /* Do nothing */ }
         }
     }
 
@@ -350,10 +337,7 @@ class WebViewRequestInterceptor(
         uri?.let { webViewClientListener?.onReceivedMaliciousSiteSafe(url = it, isForMainFrame = isForMainFrame) }
     }
 
-    override fun addExemptedMaliciousSite(
-        url: Uri,
-        feed: Feed,
-    ) {
+    override fun addExemptedMaliciousSite(url: Uri, feed: Feed) {
         maliciousSiteBlockerWebViewIntegration.onSiteExempted(url, feed)
     }
 
