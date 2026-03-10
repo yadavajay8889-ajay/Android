@@ -119,7 +119,7 @@ class RealNativeInputManager @Inject constructor(
     }
 
     private fun onKeyboardShown(widgetRoot: View?) {
-        if (omnibarController.isDuckAiMode()) return
+        if (omnibarController.isDuckAiMode() || omnibarController.isSplitMode()) return
         omnibarController.hide()
         setWidgetCardEndMargin(0)
         widgetRoot?.translationZ = 0f
