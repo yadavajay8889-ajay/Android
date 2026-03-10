@@ -21,6 +21,7 @@ import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
 import androidx.test.espresso.IdlingResource
+import logcat.logcat
 
 class PrivacyConfigIdlingResource(
     private val context: Context,
@@ -58,9 +59,15 @@ class PrivacyConfigIdlingResource(
         val stateJson = prefs.getString(key, null)
 
         if (stateJson != null && stateJson.contains("\"settings\"")) {
+            logcat(tag = "RadoiuC") {
+                "Privacy config '$key' is ready with settings: $stateJson"
+            }
             isIdle = true
             callback?.onTransitionToIdle()
         } else {
+            logcat(tag = "RadoiuC") {
+                "Privacy config '$key' is not ready yet. Current value: $stateJson"
+            }
             handler.postDelayed({ poll() }, checkInterval)
         }
     }
