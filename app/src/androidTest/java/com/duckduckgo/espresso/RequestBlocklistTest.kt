@@ -88,7 +88,7 @@ class RequestBlocklistTest {
         onView(isRoot()).perform(waitFor(500))
 
         // Now register — window.results won't exist until the new page's finished() fires
-        JsObjectIdlingResource(webView!!, "window.results").track()
+        JsObjectIdlingResource(webView!!, "window.results", checkInterval = 500L, timeoutMillis = 60_000L).track()
 
         val results = Web.onWebView()
             .perform(Atoms.script(SCRIPT))

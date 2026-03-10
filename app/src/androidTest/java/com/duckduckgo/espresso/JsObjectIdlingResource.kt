@@ -25,6 +25,8 @@ import androidx.test.espresso.IdlingResource
 class JsObjectIdlingResource(
     private val webView: WebView,
     private val objectName: String,
+    private val checkInterval: Long = 100L, // milliseconds
+    private val timeoutMillis: Long = 20_000L, // 20 seconds
 ) : IdlingResource {
 
     @Volatile
@@ -33,8 +35,7 @@ class JsObjectIdlingResource(
     private var isIdle = false
 
     private val handler = Handler(Looper.getMainLooper())
-    private val checkInterval = 100L // milliseconds
-    private val timeoutMillis = 20_000L // 20 seconds
+
     private val startTime = SystemClock.elapsedRealtime()
 
     override fun getName(): String = "JsObjectIdlingResource for $objectName"
