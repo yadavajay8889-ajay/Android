@@ -73,10 +73,10 @@ class RequestBlocklistTest {
             pressImeActionButton(),
         )
 
-        WebViewIdlingResource(webView).track()
+        WebViewIdlingResource(webView!!).track()
 
         // Now register — window.results won't exist until the new page's finished() fires
-        JsObjectIdlingResource(webView, "window.results").track()
+        JsObjectIdlingResource(webView!!, "window.results").track()
 
         val results = Web.onWebView()
             .perform(Atoms.script(SCRIPT))
