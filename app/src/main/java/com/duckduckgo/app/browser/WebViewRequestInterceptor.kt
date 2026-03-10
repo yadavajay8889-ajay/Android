@@ -211,7 +211,12 @@ class WebViewRequestInterceptor(
             webViewClientListener?.pageHasHttpResources(documentUri)
         }
 
-        if (!request.isForMainFrame && requestBlocklist.containedInBlocklist(documentUri.toString(), url.toString())) {
+        if (!request.isForMainFrame && requestBlocklist.containedInBlocklist(documentUri.toString(), url.toString()).also {
+                logcat(tag = "RadoiuC") {
+                    "Request to $url is ${if (it) "in" else "not in"} the blocklist for document $documentUri"
+                }
+            }
+        ) {
             val isContentBlockingException = contentBlocking.isAnException(documentUri.toString())
             val isInTrackerAllowList = trackerAllowlist.isAnException(documentUri.toString(), url.toString())
             val isUserAllowlisted = userAllowListRepository.isUriInUserAllowList(documentUri)

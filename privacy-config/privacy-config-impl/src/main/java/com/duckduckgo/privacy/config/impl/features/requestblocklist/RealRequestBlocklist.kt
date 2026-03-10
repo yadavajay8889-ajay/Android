@@ -102,6 +102,7 @@ class RealRequestBlocklist @Inject constructor(
                 }
             }
 
+            logcat(tag = "RadoiuC") { "Add blocked requests in memory" }
             blockedRequests.clear()
             blockedRequests.putAll(newBlockedRequests)
         }
