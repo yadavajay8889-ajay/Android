@@ -150,7 +150,7 @@ class DuckChatSyncDataManager @Inject constructor(
             jsonArray.put(
                 org.json.JSONObject().apply {
                     put("id", chatId)
-                    put("deleted", "true")
+                    put("deleted", true)
                 },
             )
         }
