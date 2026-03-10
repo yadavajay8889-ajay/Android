@@ -16,6 +16,8 @@
 
 package com.duckduckgo.eventhub.impl.pixels
 
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ProcessLifecycleOwner
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.ConflatedJob
@@ -69,7 +71,6 @@ class RealEventHubPixelManager @Inject constructor(
     private val timeProvider: TimeProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     @EventHubDispatcher private val pixelDispatcher: CoroutineDispatcher,
-    private val foregroundStateProvider: AppForegroundStateProvider,
     private val eventHubFeature: EventHubFeature,
 ) : EventHubPixelManager {
 
@@ -80,6 +81,9 @@ class RealEventHubPixelManager @Inject constructor(
     private val schedulerJob = ConflatedJob()
 
     private fun isFeatureEnabled(): Boolean = eventHubFeature.self().isEnabled()
+
+    private fun isAppInForeground(): Boolean =
+        ProcessLifecycleOwner.get().lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)
 
     private fun getTelemetryConfigs(): List<TelemetryPixelConfig> {
         cachedTelemetryConfigs?.let { return it }
@@ -266,7 +270,7 @@ class RealEventHubPixelManager @Inject constructor(
     }
 
     private fun startNewPeriod(pixelConfig: TelemetryPixelConfig): Long? {
-        if (!foregroundStateProvider.isInForeground || !isFeatureEnabled() || !pixelConfig.isEnabled) {
+        if (!isAppInForeground() || !isFeatureEnabled() || !pixelConfig.isEnabled) {
             logcat(VERBOSE) { "EventHub: skipping startNewPeriod for ${pixelConfig.name}" }
             return null
         }
