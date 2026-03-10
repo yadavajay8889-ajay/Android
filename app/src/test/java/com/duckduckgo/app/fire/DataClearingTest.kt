@@ -749,6 +749,7 @@ class DataClearingTest {
     fun whenClearSingleTabDataWithDuckAiChatTab_thenDeleteChat() = runTest {
         whenever(mockTabVisitedSitesRepository.getVisitedSites("tab1")).thenReturn(setOf("duck.ai"))
         whenever(mockTabRepository.getTab("tab1")).thenReturn(TabEntity(tabId = "tab1", url = "https://duck.ai/chat?chatID=abc-123", position = 0))
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
 
         testee.clearSingleTabData("tab1")
 
@@ -756,19 +757,21 @@ class DataClearingTest {
     }
 
     @Test
-    fun whenClearSingleTabDataWithNonDuckAiTab_thenDeleteChatStillCalled() = runTest {
+    fun whenClearSingleTabDataWithNonDuckAiTab_thenDeleteChatNotCalled() = runTest {
         whenever(mockTabVisitedSitesRepository.getVisitedSites("tab1")).thenReturn(setOf("example.com"))
         whenever(mockTabRepository.getTab("tab1")).thenReturn(TabEntity(tabId = "tab1", url = "https://example.com", position = 0))
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(false)
 
         testee.clearSingleTabData("tab1")
 
-        verify(mockDuckChat).deleteChat("https://example.com")
+        verify(mockDuckChat, never()).deleteChat(any())
     }
 
     @Test
     fun whenClearSingleTabDataWithDuckAiTab_thenAlwaysDeleteChatRegardlessOfManualOptions() = runTest {
         whenever(mockTabVisitedSitesRepository.getVisitedSites("tab1")).thenReturn(setOf("duck.ai"))
         whenever(mockTabRepository.getTab("tab1")).thenReturn(TabEntity(tabId = "tab1", url = "https://duck.ai/chat?chatID=abc-123", position = 0))
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
         configureManualOptions(emptySet())
 
         testee.clearSingleTabData("tab1")
@@ -780,6 +783,7 @@ class DataClearingTest {
     fun whenClearSingleTabDataWithDuckAiTab_thenAlwaysDeleteChatRegardlessOfFeatureFlag() = runTest {
         whenever(mockTabVisitedSitesRepository.getVisitedSites("tab1")).thenReturn(setOf("duck.ai"))
         whenever(mockTabRepository.getTab("tab1")).thenReturn(TabEntity(tabId = "tab1", url = "https://duck.ai/chat?chatID=abc-123", position = 0))
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
         showClearDuckAIChatHistoryFlow.value = false
 
         testee.clearSingleTabData("tab1")

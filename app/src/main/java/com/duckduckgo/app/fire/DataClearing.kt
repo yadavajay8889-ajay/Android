@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.fire
 
+import androidx.core.net.toUri
 import com.duckduckgo.app.fire.store.FireDataStore
 import com.duckduckgo.app.fire.store.TabVisitedSitesRepository
 import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
@@ -79,6 +80,7 @@ class DataClearing @Inject constructor(
 
     private suspend fun clearDuckAiChatIfNeeded(tabUrl: String?) {
         if (tabUrl == null) return
+        if (!duckChat.isDuckChatUrl(tabUrl.toUri())) return
         duckChat.deleteChat(tabUrl)
     }
 
