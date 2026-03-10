@@ -59,6 +59,7 @@ class RealNativeInputOmnibarController(
 ) : NativeInputOmnibarController {
 
     private var layoutListener: View.OnLayoutChangeListener? = null
+    private var layoutAttachListener: View.OnAttachStateChangeListener? = null
 
     override fun isDuckAiMode(): Boolean = omnibar.viewMode == DuckAI
 
@@ -134,18 +135,37 @@ class RealNativeInputOmnibarController(
     }
 
     private fun applyOnLayout(omnibarView: View, block: () -> Unit) {
-        layoutListener?.let { omnibarView.removeOnLayoutChangeListener(it) }
+        removeLayoutListener(omnibarView)
         block()
         val listener = View.OnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
             if (rootView.findViewById<View?>(R.id.inputModeWidget) != null) block()
         }
+        val attachListener =
+            object : View.OnAttachStateChangeListener {
+                override fun onViewAttachedToWindow(v: View) = Unit
+
+                override fun onViewDetachedFromWindow(v: View) {
+                    v.removeOnLayoutChangeListener(listener)
+                    v.removeOnAttachStateChangeListener(this)
+                    if (layoutListener == listener) {
+                        layoutListener = null
+                    }
+                    if (layoutAttachListener == this) {
+                        layoutAttachListener = null
+                    }
+                }
+            }
         layoutListener = listener
+        layoutAttachListener = attachListener
         omnibarView.addOnLayoutChangeListener(listener)
+        omnibarView.addOnAttachStateChangeListener(attachListener)
     }
 
     private fun removeLayoutListener(omnibarView: View) {
         layoutListener?.let { omnibarView.removeOnLayoutChangeListener(it) }
+        layoutAttachListener?.let { omnibarView.removeOnAttachStateChangeListener(it) }
         layoutListener = null
+        layoutAttachListener = null
     }
 
     override fun getButtonsWidth(): Int {
