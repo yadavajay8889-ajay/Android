@@ -284,6 +284,7 @@ class OnboardingDaxDialogTests {
         whenever(appInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - 3 * 24 * 3600 * 1000L)
         whenever(dismissedCtaDao.exists(DAX_INTRO_PRIVACY_PRO)).thenReturn(false)
         whenever(extendedOnboardingFeatureToggles.privacyProCta()).thenReturn(mockEnabledToggle)
+        whenever(extendedOnboardingFeatureToggles.privacyProCtaSkippedOnboarding()).thenReturn(mockEnabledToggle)
         whenever(mockSubscriptions.isEligible()).thenReturn(true)
 
         val result = testee.refreshCta(
