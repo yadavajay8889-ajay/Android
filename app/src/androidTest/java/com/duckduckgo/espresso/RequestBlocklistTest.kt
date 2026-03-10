@@ -79,6 +79,10 @@ class RequestBlocklistTest {
 
         WebViewIdlingResource(webView!!).track()
 
+        // Force Espresso to wait for the page to finish loading before creating
+        // JsObjectIdlingResource, so its timeout clock starts after the page is ready
+        onView(isRoot()).perform(waitFor(500))
+
         // Now register — window.results won't exist until the new page's finished() fires
         JsObjectIdlingResource(webView!!, "window.results").track()
 
