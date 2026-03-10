@@ -69,7 +69,11 @@ class RequestBlocklistTest {
         WebViewIdlingResource(webView!!).track()
 
         // Wait for privacy config to download and populate the request blocklist
-        onView(isRoot()).perform(waitFor(15000))
+        PrivacyConfigIdlingResource(
+            context = InstrumentationRegistry.getInstrumentation().targetContext,
+            prefsName = "com.duckduckgo.feature.toggle.requestBlocklist",
+            key = "requestBlocklist",
+        ).track()
 
         onView(withId(R.id.omnibarTextInput)).perform(
             clearText(),
