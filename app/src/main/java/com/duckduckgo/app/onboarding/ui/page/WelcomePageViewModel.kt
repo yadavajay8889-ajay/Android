@@ -266,6 +266,7 @@ class WelcomePageViewModel @Inject constructor(
             SYNC_RESTORE -> {
                 viewModelScope.launch {
                     logcat { "Sync-AutoRestore: user skipped restore" }
+                    reinstallUser = true
                     _commands.send(ShowSkipOnboardingOption)
                 }
             }
