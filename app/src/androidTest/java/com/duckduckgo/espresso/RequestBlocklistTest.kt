@@ -23,6 +23,7 @@ import androidx.test.espresso.IdlingResource
 import androidx.test.espresso.action.ViewActions.clearText
 import androidx.test.espresso.action.ViewActions.pressImeActionButton
 import androidx.test.espresso.action.ViewActions.typeText
+import androidx.test.espresso.matcher.ViewMatchers.isRoot
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.web.model.Atoms
 import androidx.test.espresso.web.sugar.Web
@@ -66,6 +67,9 @@ class RequestBlocklistTest {
         }
 
         WebViewIdlingResource(webView!!).track()
+
+        // Wait for privacy config to download and populate the request blocklist
+        onView(isRoot()).perform(waitFor(15000))
 
         onView(withId(R.id.omnibarTextInput)).perform(
             clearText(),
