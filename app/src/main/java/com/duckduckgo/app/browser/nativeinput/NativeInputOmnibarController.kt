@@ -59,6 +59,7 @@ class RealNativeInputOmnibarController(
 ) : NativeInputOmnibarController {
 
     private var layoutListener: View.OnLayoutChangeListener? = null
+    private var attachStateListener: View.OnAttachStateChangeListener? = null
 
     override fun isDuckAiMode(): Boolean = omnibar.viewMode == DuckAI
 
@@ -135,26 +136,32 @@ class RealNativeInputOmnibarController(
 
     private fun applyOnLayout(omnibarView: View, block: () -> Unit) {
         removeLayoutListener(omnibarView)
+        removeAttachStateListener(omnibarView)
         block()
         val listener = View.OnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
             if (rootView.findViewById<View?>(R.id.inputModeWidget) != null) block()
         }
         layoutListener = listener
         omnibarView.addOnLayoutChangeListener(listener)
-        omnibarView.addOnAttachStateChangeListener(
-            object : View.OnAttachStateChangeListener {
-                override fun onViewAttachedToWindow(v: View) = Unit
-                override fun onViewDetachedFromWindow(v: View) {
-                    removeLayoutListener(v)
-                    v.removeOnAttachStateChangeListener(this)
-                }
-            },
-        )
+        val listenerOnAttachState = object : View.OnAttachStateChangeListener {
+            override fun onViewAttachedToWindow(v: View) = Unit
+            override fun onViewDetachedFromWindow(v: View) {
+                removeLayoutListener(v)
+                removeAttachStateListener(v)
+            }
+        }
+        attachStateListener = listenerOnAttachState
+        omnibarView.addOnAttachStateChangeListener(listenerOnAttachState)
     }
 
     private fun removeLayoutListener(omnibarView: View) {
         layoutListener?.let { omnibarView.removeOnLayoutChangeListener(it) }
         layoutListener = null
+    }
+
+    private fun removeAttachStateListener(omnibarView: View) {
+        attachStateListener?.let { omnibarView.removeOnAttachStateChangeListener(it) }
+        attachStateListener = null
     }
 
     override fun getButtonsWidth(): Int {
